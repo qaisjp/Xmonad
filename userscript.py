@@ -11,7 +11,7 @@ for line in subprocess.check_output(['who']).split('\n'):
     if line != "":
         users.append(line.split())
 
-        if line[0:len(selfname)] != selfname:
+        if line[:len(selfname)] != selfname:
           terms += 1
 
 alert_colour = "<fc=#FF0000>"
