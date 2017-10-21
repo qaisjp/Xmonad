@@ -42,8 +42,8 @@ import qualified Data.Map        as M
 myTerminal = "/usr/bin/gnome-terminal"
 
 scratchpads = [
-  NS "term" "gnome-terminal --role=scratchpad" (role =? "scratchpad") (customFloating $ W.RationalRect (1/12) (1/12) (5/6) (5/6)),
-  NS "git" "gnome-terminal --role=scratchpad" (role =? "scratchpad") (customFloating $ W.RationalRect (1/12) (1/12) (5/6) (5/6))]
+  NS "term" "gnome-terminal --role=scratchpad" (role =? "scratchpad") (customFloating $ W.RationalRect (1/12) (1/12) (10/12) (10/12)),
+  NS "git" "gnome-terminal --role=scratchpad" (role =? "scratchpad") (customFloating $ W.RationalRect (1/12) (1/12) (10/12) (10/12))]
   where role = stringProperty "WM_WINDOW_ROLE"
 
 ------------------------------------------------------------------------
