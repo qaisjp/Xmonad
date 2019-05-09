@@ -35,6 +35,6 @@ for user in users:
             actaul_name = user[0]
         print(alert_colour + " -- " + 
               actual_name + "@" + 
-              user[-1:][0].split('.')[0][1:] + 
+              user[-1:][0] + #.split('.')[0][1:] +
               end_colour, end="")
 

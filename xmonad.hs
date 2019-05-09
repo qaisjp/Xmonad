@@ -43,8 +43,9 @@ myTerminal = "/usr/bin/gnome-terminal"
 
 scratchpads = [
   NS "term" "gnome-terminal --role=scratchpad" (role =? "scratchpad") (customFloating $ W.RationalRect (1/12) (1/12) (5/6) (5/6)),
-  NS "git" "gnome-terminal --role=scratchpad" (role =? "scratchpad") (customFloating $ W.RationalRect (1/12) (1/12) (5/6) (5/6))]
-  where role = stringProperty "WM_WINDOW_ROLE"
+  NS "spotify" "spotify" (className =? "Spotify") (customFloating $ W.RationalRect (1/12) (1/12) (5/6) (5/6))]
+  where
+    role = stringProperty "WM_WINDOW_ROLE"
 
 ------------------------------------------------------------------------
 -- Workspaces
@@ -76,6 +77,7 @@ myManageHook = composeAll
       -- Below gets chrome_app_list to properly float
     , role =? "bubble"     --> doFloat
     , role =? "pop-up"     --> doFloat
+    , role =? "Spotify"     --> doFloat
     , isFullscreen --> (doF W.focusDown <+> doFullFloat)]
   where
     role = stringProperty "WM_WINDOW_ROLE"
@@ -115,7 +117,7 @@ myLayout = avoidStruts (
 -- Currently based on the ir_black theme.
 --
 myNormalBorderColor  = "#181818"
-myFocusedBorderColor = "#333333"
+myFocusedBorderColor = "#FF8500"
 
 -- Colors for text and backgrounds of each tab when in "Tabbed" layout.
 myTabConfig = defaultTheme {
@@ -134,7 +136,7 @@ xmobarTitleColor = "#DDD"
 xmobarCurrentWorkspaceColor = "#FF8500"
 
 -- Width of the window border in pixels.
-myBorderWidth = 1
+myBorderWidth = 2
 
 
 ------------------------------------------------------------------------
@@ -158,46 +160,32 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
   -- Start EMACS
   , ((modMask, xK_e),
-     spawn "emacsclient -c -a emacs")
-
-  -- Start Blender
-  --, ((modMask, xK_b),
-  --   spawn "blender")
-
-  -- Start GIMP
-  , ((modMask, xK_g),
-     spawn "gimp")
-
-  -- Start GitKraken
-  , ((modMask, xK_r),
-     spawn "gitkraken")
+     spawn "code")
     
   -- Start Chrome Browser
   , ((modMask, xK_i),
      spawn "google-chrome")
     
-  -- Start Vivaldi Browser
-  , ((modMask, xK_v),
-     spawn "vivaldi")
-    
-  -- Start KiCAD
-  --, ((modMask, xK_c),
-  --   spawn "kicad")
-    
   -- Lock the screen using xscreensaver.
-  , ((modMask .|. controlMask, xK_l),
-     spawn "~/.lock.sh")
-  --   spawn "xscreensaver-command -lock")
+  , ((modMask, xK_x),
+    spawn "~/.xmonad/lock.sh")
+    -- spawn "xscreensaver-command -lock")
+
+
+  , ((modMask .|. shiftMask, xK_x),
+     spawn "python ~/.xmonad/lockswitch.py")
 
 
   -- show/hide scratchpads
   , ((0, xK_F1), namedScratchpadAction scratchpads "term")
+  -- show/hide scratchpad
+  , ((myModMask, xK_s), namedScratchpadAction scratchpads "spotify")
 
     
   -- Launch dmenu.
   -- Use this to launch programs without a key binding.
   , ((modMask, xK_p),
-     spawn "dmenu_run")
+     spawn "yeganesh -x | ${SHELL:-\"/bin/sh\"} &")
 
   -- Take a screenshot in select mode.
   -- After pressing this key binding, click a window, or draw a rectangle with
@@ -209,6 +197,8 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
   -- That is, take a screenshot of everything you see.
   --, ((modMask .|. controlMask .|. shiftMask, xK_p),
   --   spawn "screenshot")
+
+  , ((0, xK_Print), spawn "gnome-screenshot -i")
 
   , ((mod1Mask, xK_space), namedScratchpadAction scratchpads "term")
 
@@ -245,40 +235,43 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
      spawn "amixer -q set Master 5%-")
     
   -- Audio previous.
-  --, ((0, 0x1008FF16),
-  --   spawn "")
+  , ((0, 0x1008FF16),
+    spawn "dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous")
 
   -- Play/pause.
-  --, ((0, 0x1008FF14),
-  --   spawn "")
+  , ((0, 0x1008FF14),
+    spawn "dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause")
 
   -- Audio next.
-  --, ((0, 0x1008FF17),
-  --   spawn "")
+  , ((0, 0x1008FF17),
+    spawn "dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next")
 
   -- Eject CD tray.
   --, ((0, 0x1008FF2C),
   --   spawn "eject")
 
   -- Cycle workspaces left and right
-  , ((controlMask .|. mod1Mask, xK_Right),
+  , ((modMask, xK_Right),
      nextWS)
 
-  , ((controlMask .|. mod1Mask, xK_Left),
+  , ((modMask, xK_Left),
      prevWS)
 
   -- Move focus to the next window with workspace-like keys
-  , ((controlMask .|. mod1Mask, xK_Down),
+  , ((modMask, xK_Down),
      windows W.focusDown)
 
+  , ((modMask, xK_Tab),
+     toggleWS' ["NSP"])
+
   -- Move focus to the previous window with workspace-like keys
-  , ((controlMask .|. mod1Mask, xK_Up),
+  , ((modMask, xK_Up),
      windows W.focusUp  )
     
-  , ((controlMask .|. mod1Mask .|. shiftMask, xK_Right),
+  , ((controlMask .|. modMask, xK_Right),
      shiftToNext >> nextWS)
 
-  , ((controlMask .|. mod1Mask .|. shiftMask, xK_Left),
+  , ((controlMask .|. modMask, xK_Left),
      shiftToPrev >> prevWS)
 
   , ((modMask, xK_d ),
@@ -308,8 +301,8 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
      refresh)
 
   -- Move focus to the next window.
-  , ((modMask, xK_Tab),
-     windows W.focusDown)
+  --, ((mod1Mask, xK_Tab),
+  --   windows W.focusDown)
 
   -- Move focus to the next window.
   , ((modMask, xK_j),
@@ -317,11 +310,11 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
   -- Move focus to the previous window.
   , ((modMask, xK_k),
-     windows W.focusUp  )
+     windows W.focusUp)
 
   -- Move focus to the master window.
   , ((modMask, xK_m),
-     windows W.focusMaster  )
+     windows W.focusMaster)
 
   -- Swap the focused window and the master window.
   , ((modMask, xK_Return),
@@ -329,11 +322,11 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
   -- Swap the focused window with the next window.
   , ((modMask .|. shiftMask, xK_j),
-     windows W.swapDown  )
+     windows W.swapDown)
 
   -- Swap the focused window with the previous window.
   , ((modMask .|. shiftMask, xK_k),
-     windows W.swapUp    )
+     windows W.swapUp)
 
   -- Shrink the master area.
   , ((modMask, xK_h),
@@ -374,7 +367,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
   -- mod-shift-[1..9], Move client to workspace N
   [((m .|. modMask, k), windows $ f i)
       | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
-      , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+      , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
   -- ++
 
   -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
@@ -429,22 +422,32 @@ myMouseBindings (XConfig {XMonad.modMask = modMask}) = M.fromList $
 --
 myStartupHook :: X ()
 myStartupHook = do
+  setWMName "LG3D"
   spawn "xscreensaver &"
+  spawn "pacmd set-card-profile alsa_card.pci-0000_00_1f.3 output:analog-stereo"
   spawn "feh --bg-fill $HOME/.wall&"
   -- spawn "cvlc --video-wallpaper --no-audio --no-video-title-show --loop $HOME/.wall&"
   spawn "xsetroot -cursor_name left_ptr"
-  spawn "emacs --daemon"
+  -- spawn "google-chrome"
   spawn "amixer -q set Master mute"
 
 
 ------------------------------------------------------------------------
--- Run xmonad with all the defaults we set up.
 -- 
+replace :: Eq a => [a] -> [a] -> [a] -> [a]
+replace [] _ _ = []
+replace s find repl =
+    if take (length find) s == find
+        then repl ++ (replace (drop (length find) s) find repl)
+        else [head s] ++ (replace (tail s) find repl)
+
+replace_n find repl s = replace s find repl
+
 main = do
   xmproc <- spawnPipe "xmobar ~/.xmonad/xmobar.hs"
   xmonad $ defaults {
       logHook = dynamicLogWithPP $ xmobarPP {
-            ppOutput = hPutStrLn xmproc-- . replace "NSP " ""
+            ppOutput = hPutStrLn xmproc . replace_n "NSP " ""
           , ppTitle = xmobarColor xmobarTitleColor "" . shorten 100
           , ppCurrent = xmobarColor xmobarCurrentWorkspaceColor ""
           , ppSep = "   "
