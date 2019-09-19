@@ -1,6 +1,11 @@
 # xmonad-config
 xmonad-config is the [xmonad](http://xmonad.org/) configuration used by Vic Fryzel.
 
+```
+cabal install xmonad-contrib yeganesh
+cabal install xmobar --flags="with_xft"
+```
+
 
 ## Introduction
 
