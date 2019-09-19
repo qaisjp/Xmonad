@@ -430,6 +430,7 @@ myStartupHook = do
   spawn "xsetroot -cursor_name left_ptr"
   -- spawn "google-chrome"
   spawn "amixer -q set Master mute"
+  spawn "emacs --daemon"
 
 
 ------------------------------------------------------------------------
