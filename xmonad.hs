@@ -84,6 +84,8 @@ myManageHook = composeAll
     role = stringProperty "WM_WINDOW_ROLE"
     name = stringProperty "WM_NAME"
 
+myHandleEventHook = defaultConfig
+
 manageScratchPad :: ManageHook
 manageScratchPad = scratchpadManageHook (W.RationalRect l t w h)
   where
@@ -458,7 +460,7 @@ main = do
       , startupHook = myStartupHook
       , handleEventHook = mconcat
                           [ docksEventHook
-                          , handleEventHook defaultConfig ]
+                          , handleEventHook myHandleEventHook ]
 
   }
 
