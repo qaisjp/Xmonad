@@ -9,6 +9,7 @@ import XMonad.Actions.MouseGestures
 import XMonad.Actions.SpawnOn
 import XMonad.Actions.Warp
 import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.DynamicProperty
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
@@ -77,14 +78,16 @@ myManageHook = composeAll
       -- Below gets chrome_app_list to properly float
     , role =? "bubble"     --> doFloat
     , role =? "pop-up"     --> doFloat
-    , role =? "Spotify"     --> doFloat
     , className =? "feh" --> (doF W.swapDown <+> (doRectFloat $ W.RationalRect 0.6 0.6 0.25 0.3))
     , isFullscreen --> (doF W.focusDown <+> doFullFloat)]
   where
     role = stringProperty "WM_WINDOW_ROLE"
     name = stringProperty "WM_NAME"
 
-myHandleEventHook = defaultConfig
+-- See https://www.reddit.com/r/xmonad/comments/ay7824/floating_spotify_in_a_namedscratchpad/
+spotifyEventHook = dynamicPropertyChange "WM_NAME" (title =? "Spotify" --> floating)
+    where floating = customFloating $ W.RationalRect (1/12) (1/12) (5/6) (5/6)
+
 
 manageScratchPad :: ManageHook
 manageScratchPad = scratchpadManageHook (W.RationalRect l t w h)
@@ -460,7 +463,8 @@ main = do
       , startupHook = myStartupHook
       , handleEventHook = mconcat
                           [ docksEventHook
-                          , handleEventHook myHandleEventHook ]
+                          , spotifyEventHook
+                          , handleEventHook def ]
 
   }
 
