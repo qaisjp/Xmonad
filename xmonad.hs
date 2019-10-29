@@ -78,6 +78,7 @@ myManageHook = composeAll
     , role =? "bubble"     --> doFloat
     , role =? "pop-up"     --> doFloat
     , role =? "Spotify"     --> doFloat
+    , className =? "feh" --> (doF W.swapDown <+> (doRectFloat $ W.RationalRect 0.6 0.6 0.25 0.3))
     , isFullscreen --> (doF W.focusDown <+> doFullFloat)]
   where
     role = stringProperty "WM_WINDOW_ROLE"
